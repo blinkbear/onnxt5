@@ -13,19 +13,19 @@ _models_path = _package_path.joinpath('model_data')
 
 def get_sess(ouput_prefix):
     """ Function to load previously exported models """
-    decoder_sess = InferenceSession(ouput_prefix+"-decoder-with-lm-head.onnx")
+    decoder_sess = InferenceSession(ouput_prefix+"-decoder-withw-lm-head.onnx")
     encoder_sess = InferenceSession(ouput_prefix+"-encoder.onnx")
     return decoder_sess, encoder_sess
 
-def get_encoder_decoder_tokenizer():
+def get_encoder_decoder_tokenizer(providers=['CPUExecutionProvider']):
     """ Function to get a default pre-trained version of T5 in ONNX ready for use """
     try:
-        decoder_sess, encoder_sess = _handle_creation_of_sessions()
+        decoder_sess, encoder_sess = _handle_creation_of_sessions(providers)
     except:
         filelist = glob.glob(os.path.join(_models_path, "*"))
         for f in filelist:
             os.remove(f)
-        decoder_sess, encoder_sess = _handle_creation_of_sessions()
+        decoder_sess, encoder_sess = _handle_creation_of_sessions(providers)
 
     # The tokenizer should be the one you trained in the case of fine-tuning
     tokenizer = T5Tokenizer.from_pretrained('t5-base')
@@ -33,7 +33,7 @@ def get_encoder_decoder_tokenizer():
     return decoder_sess, encoder_sess, tokenizer
 
 
-def _handle_creation_of_sessions():
+def _handle_creation_of_sessions(providers):
     path_t5_encoder = _models_path.joinpath('t5-encoder.onnx')
     path_t5_decoder = _models_path.joinpath('t5-decoder-with-lm-head.onnx')
 
@@ -50,8 +50,8 @@ def _handle_creation_of_sessions():
         _download_generation_model(path_t5_decoder_tarball)
 
     # Loading the models
-    decoder_sess = InferenceSession(str(path_t5_decoder))
-    encoder_sess = InferenceSession(str(path_t5_encoder))
+    decoder_sess = InferenceSession(str(path_t5_decoder),providers=providers)
+    encoder_sess = InferenceSession(str(path_t5_encoder),providers=providers)
     return decoder_sess, encoder_sess
 
 
