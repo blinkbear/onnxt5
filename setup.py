@@ -22,7 +22,7 @@ setup(
     packages=find_packages(),  # Required
     python_requires='>=3.5, <4',
     install_requires=[
-        "onnxruntime>=1.4.0",
+        "onnxruntime-gpu>=1.4.0",
         "requests>=2.22.0",
         "torch>=1.4.0",
         "tqdm>=4.48.2",
